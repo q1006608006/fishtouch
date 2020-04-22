@@ -5,10 +5,9 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.project.MavenProject;
 import top.ivan.fishtouch.bean.AssemblyConfig;
 import top.ivan.fishtouch.bean.ProfileConfig;
-
-import java.util.Set;
 
 /**
  * @author Ivan
@@ -28,13 +27,16 @@ public class FormatMojo extends AbstractMojo {
     private AssemblyConfig assembly;
 
     @Parameter(
-            defaultValue = "${project.build.finalName}",
-            readonly = true
+            defaultValue = "${project}",
+            readonly = true,
+            required = true
     )
-    private String finalName;
+    private MavenProject project;
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
+
+        String finalName = project.getBuild().getFinalName();
 
         //todo: 安装环境
 
