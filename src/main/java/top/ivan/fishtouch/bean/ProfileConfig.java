@@ -16,7 +16,7 @@ public class ProfileConfig {
 
     private Set<String> envs = new HashSet<>(Arrays.asList("dev", "test", "prod"));
 
-    private String location = "profile";
+    private String location = "src/main/profile";
 
     private String profileName = "profile.properties";
 
