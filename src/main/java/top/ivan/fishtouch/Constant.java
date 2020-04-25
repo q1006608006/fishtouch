@@ -7,5 +7,11 @@ package top.ivan.fishtouch;
  */
 public class Constant {
 
-    public static final String PROFILE_EXAMPLE = "profile.properties";
+    public static final String PROFILE_EXAMPLE = "profile.properties.example";
+
+    public static final String SCRIPT_PROFILE_ENV = "@script.profileEnv@";
+
+    public static final String SCRIPT_MAIN_CLASS = "@script.mainClass@";
+
+
 }

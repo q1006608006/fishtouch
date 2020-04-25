@@ -18,7 +18,7 @@ public class ProfileConfig {
 
     private String location = "src/main/profile";
 
-    private String profileName = "profile.properties";
+    private String profileName = "profile.properties.example";
 
     public List<String> getRelative() {
         return relative;
