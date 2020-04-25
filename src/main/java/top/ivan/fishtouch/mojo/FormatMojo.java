@@ -46,7 +46,7 @@ public class FormatMojo extends AbstractMojo {
 
         String finalName = project.getBuild().getFinalName();
 
-        //安装环境
+        //安装环境文件夹及对应文件
         if (environment != null) {
             try {
                 installEnvs();
@@ -56,6 +56,7 @@ public class FormatMojo extends AbstractMojo {
         }
 
         //todo: 安装脚本、assembly资源、libs文件夹、deploy文件
+
 
         //todo: 创建example文件
 
@@ -110,7 +111,7 @@ public class FormatMojo extends AbstractMojo {
 
         conf.setEnvs(new HashSet<>(Arrays.asList("dev", "test")));
 
-        conf.setRelative(Arrays.asList("./profile"));
+        conf.setRelative(Arrays.asList("profile"));
 
         FormatMojo mojo = new FormatMojo();
 
