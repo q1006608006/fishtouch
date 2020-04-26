@@ -9,7 +9,7 @@ source /etc/profile
 #该脚本所在目录
 RUN_HOME=$(dirname $(readlink -f "$0"))
 #加载配置文件
-CLASS_PATH=.:$RUN_HOME/../etc
+CLASS_PATH=.:$RUN_HOME/../conf
 #load apps jar
 #for v_i in `ls $RUN_HOME/../apps/*.jar`
 #do

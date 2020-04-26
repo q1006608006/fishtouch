@@ -1,4 +1,4 @@
-package top.ivan.fishtouch.bean;
+package top.ivan.fishtouch.format.bean;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -18,7 +18,7 @@ public class ProfileConfig {
 
     private String location = "src/main/profile";
 
-    private String profileName = "profile.properties.example";
+    private String profileName = "profile.properties";
 
     public List<String> getRelative() {
         return relative;

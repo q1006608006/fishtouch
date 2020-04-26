@@ -1,6 +1,6 @@
 #!/bin/bash
 
-app_jar=tools-1.0-SNAPSHOT.jar
+app_jar=@script.mainJar@
 
 script=`readlink -f $0`
 script_path=${script%/*}

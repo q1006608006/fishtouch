@@ -1,4 +1,4 @@
-package top.ivan.fishtouch.bean;
+package top.ivan.fishtouch.format.bean;
 
 /**
  * @author Ivan
