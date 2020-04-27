@@ -95,7 +95,7 @@ public class ResourceManager {
         List<String> fileSets = new ArrayList<>();
 
         for (String relative : paths) {
-            AssemblyFileSet fs = new AssemblyFileSet();
+            AssemblyFileSet fs = new AssemblyFileSet(2);
             fs.setDirectory(Paths.get(relative, "${profile.env}").toString().replace("\\", "/"));
             fs.setOutputDirectory("conf");
             fs.setFiltered(false);
@@ -108,7 +108,7 @@ public class ResourceManager {
 
         if (null != this.extLibs) {
             for (String extLib : this.extLibs) {
-                AssemblyFileSet fs = new AssemblyFileSet();
+                AssemblyFileSet fs = new AssemblyFileSet(2);
                 fs.setDirectory(extLib);
                 fs.setOutputDirectory("libs");
                 fs.setFiltered(false);
@@ -125,6 +125,23 @@ public class ResourceManager {
         String exampleSrc = loadExample(Constant.POM_EXAMPLE);
 
         //todo 替换@pom.extResource@
+        List<String> allLocation = new ArrayList<>();
+        if (null != environment.getRelative()) {
+            allLocation.addAll(environment.getRelative());
+        }
+        if (StringUtils.isNotBlank(environment.getLocation())) {
+            allLocation.add(environment.getLocation());
+        }
+
+        List<String> resourceTexts = new ArrayList<>();
+        for (String location : allLocation) {
+            PomResource pr = new PomResource(3);
+            pr.setDirectory(location);
+            pr.setFiltering(false);
+        }
+
+        PomResource pr = new PomResource(3);
+        pr.setDirectory(null);
 
         //todo 替换@pom.filters@ 3个tab
 
@@ -154,9 +171,9 @@ public class ResourceManager {
 
 
     private static class AssemblyFileSet {
-        public static final int rootTab = 2;
-        public static final int secTab = rootTab + 1;
-        public static final int trdTab = secTab + 1;
+        public int rootTab = 2;
+        public int secTab = rootTab + 1;
+        public int trdTab = secTab + 1;
 
         private String directory;
         private String outputDirectory;
@@ -165,6 +182,12 @@ public class ResourceManager {
         private List<String> excludes;
         private List<String> includes;
         private String lineEnding;
+
+        public AssemblyFileSet(int rootTab) {
+            this.rootTab = rootTab;
+            secTab = rootTab + 1;
+            trdTab = secTab + 1;
+        }
 
         public String getDirectory() {
             return directory;
@@ -261,12 +284,18 @@ public class ResourceManager {
 
     private static class PomResource {
 
-        public static final int rootTab = 3;
-        public static final int secTab = rootTab + 1;
-        public static final int trdTab = secTab + 1;
+        public int rootTab = 3;
+        public int secTab = rootTab + 1;
+        public int trdTab = secTab + 1;
 
         private String directory;
         private boolean filtering;
+
+        public PomResource(int rootTab) {
+            this.rootTab = rootTab;
+            secTab = rootTab + 1;
+            trdTab = secTab + 1;
+        }
 
         public String getDirectory() {
             return directory;
