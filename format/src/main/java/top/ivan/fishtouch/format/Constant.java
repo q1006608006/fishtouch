@@ -33,4 +33,6 @@ public class Constant {
     public static final String SCRIPT_BAT_SPRINGBOOT_EXAMPLE = "springboot/run.bat";
     public static final String SCRIPT_BAT_COMMON_EXAMPLE = "common/run.bat";
 
+    public static final String POM_EXAMPLE = "pom.xml";
+
 }

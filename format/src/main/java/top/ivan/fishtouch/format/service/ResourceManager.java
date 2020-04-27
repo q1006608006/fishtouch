@@ -121,6 +121,19 @@ public class ResourceManager {
         return exampleSrc.replace(ASSEMBLY_EXT_LIBS, assemblyExtLibsText).replace(ASSEMBLY_PROFILE, assemblyProfilesText);
     }
 
+    public String getPom() throws IOException, URISyntaxException {
+        String exampleSrc = loadExample(Constant.POM_EXAMPLE);
+
+        //todo 替换@pom.extResource@
+
+        //todo 替换@pom.filters@ 3个tab
+
+        //todo 替换@pom.filters@ 4个tab
+
+        //todo 替换@pom.assembly.descriptor@
+
+        //todo 替换@pom.profiles@
+    }
 
     private static String loadExample(String name) throws IOException, URISyntaxException {
         if (!exampleMap.containsKey(name)) {
@@ -134,6 +147,11 @@ public class ResourceManager {
         int blankCount = tabCount * TAB_BLANK;
         return Strings.repeat(" ", blankCount) + src;
     }
+
+    private static String getXmlElement(String tag, Object val) {
+        return "<" + tag + ">" + val + "</" + tag + ">";
+    }
+
 
     private static class AssemblyFileSet {
         public static final int rootTab = 2;
@@ -239,8 +257,44 @@ public class ResourceManager {
             return builder.toString();
         }
 
-        public static String getXmlElement(String tag, Object val) {
-            return "<" + tag + ">" + val + "</" + tag + ">";
+    }
+
+    private static class PomResource {
+
+        public static final int rootTab = 3;
+        public static final int secTab = rootTab + 1;
+        public static final int trdTab = secTab + 1;
+
+        private String directory;
+        private boolean filtering;
+
+        public String getDirectory() {
+            return directory;
+        }
+
+        public void setDirectory(String directory) {
+            this.directory = directory;
+        }
+
+        public boolean isFiltering() {
+            return filtering;
+        }
+
+        public void setFiltering(boolean filtering) {
+            this.filtering = filtering;
+        }
+
+        @Override
+        public String toString() {
+            StringBuilder builder = new StringBuilder();
+            builder.append(getTabStr("<resource>", rootTab)).append('\n');
+
+            builder.append(getTabStr(getXmlElement("filtering", filtering), secTab)).append('\n');
+            builder.append(getTabStr(getXmlElement("directory", directory), secTab)).append('\n');
+
+            builder.append(getTabStr("</resource>", rootTab)).append('\n');
+            return builder.toString();
         }
     }
+
 }

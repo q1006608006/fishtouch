@@ -4,19 +4,12 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <modelVersion>4.0.0</modelVersion>
 
-    <parent>
-        <groupId>cn.anicert</groupId>
-        <artifactId>anicert-diop-parent</artifactId>
-        <version>1.0-SNAPSHOT</version>
-    </parent>
-
-    <artifactId>anicert-diop-gateway</artifactId>
-    <name>anicert-diop-gateway</name>
+    <artifactId> {@your project artifactId here@} </artifactId>
 
     <description>Example for Project</description>
 
     <dependencies>
-        @pom.dependency@
+
     </dependencies>
 
     <build>
