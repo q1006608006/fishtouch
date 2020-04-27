@@ -96,7 +96,7 @@ public class ResourceManager {
 
         for (String relative : paths) {
             AssemblyFileSet fs = new AssemblyFileSet();
-            fs.setDirectory(Paths.get(relative, "${profile.env}").toString().replace("\\","/"));
+            fs.setDirectory(Paths.get(relative, "${profile.env}").toString().replace("\\", "/"));
             fs.setOutputDirectory("conf");
             fs.setFiltered(false);
             fs.setExcludes(Collections.singletonList(environment.getProfileName()));

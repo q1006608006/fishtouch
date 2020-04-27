@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+         xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>cn.anicert</groupId>
+        <artifactId>anicert-diop-parent</artifactId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>anicert-diop-gateway</artifactId>
+    <name>anicert-diop-gateway</name>
+
+    <description>Example for Project</description>
+
+    <dependencies>
+        @pom.dependency@
+    </dependencies>
+
+    <build>
+        <resources>
+            <resource>
+                <filtering>true</filtering>
+                <directory>${project.basedir}/src/main/resources</directory>
+            </resource>
+<!--            <resource>
+                <directory>${project.basedir}/src/main/profiles/${profile.env}</directory>
+                <filtering>false</filtering>
+                <excludes>
+                    <exclude>application.properties</exclude>
+                </excludes>
+            </resource>-->
+            @pom.extResource@
+        </resources>
+
+        <filters>
+<!--            <filter>${project.basedir}/src/main/profiles/${profile.env}/application.properties</filter>-->
+            @pom.filters@
+        </filters>
+
+        <plugins>
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>3.1.0</version>
+                <executions>
+                    <execution>
+                        <id>make-assembly</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <appendAssemblyId>false</appendAssemblyId>
+                    <filters>
+                        <!--<filter>${project.basedir}/src/main/profiles/${profile.env}/application.properties</filter>-->
+                        @pom.filters@
+                    </filters>
+                    <descriptors>
+                        @pom.assembly.descriptor@
+                        <!--<descriptor>src/main/assembly/assembly.xml</descriptor>-->
+                    </descriptors>
+                    <finalName>${project.build.finalName}-${profile.env}</finalName>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+    <profiles>
+        @pom.profiles@
+
+<!--        <profile>
+            <id>dev</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <profile.env>dev</profile.env>
+            </properties>
+        </profile>
+        <profile>
+            <id>test</id>
+            <properties>
+                <profile.env>test</profile.env>
+            </properties>
+        </profile>
+        <profile>
+            <id>hw</id>
+            <properties>
+                <profile.env>hw</profile.env>
+            </properties>
+        </profile>
+        <profile>
+            <id>prod</id>
+            <properties>
+                <profile.env>prod</profile.env>
+            </properties>
+        </profile>-->
+    </profiles>
+</project>

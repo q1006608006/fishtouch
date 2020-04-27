@@ -37,7 +37,7 @@ public class FormatMojo extends AbstractMojo {
     @Parameter(defaultValue = "springboot")
     private String shellType;
 
-    @Parameter(defaultValue = "${mainClass}")
+    @Parameter(defaultValue = "@mainClass@")
     private String mainClass;
 
     @Parameter(

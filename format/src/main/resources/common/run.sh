@@ -3,18 +3,12 @@
 #Function:启停springboot服务
 . /etc/rc.d/init.d/functions
 source /etc/profile
-#export JAVA_HOME=/usr/local/jdk
-#export PATH=$JAVA_HOME/bin:$PATH
 
 #该脚本所在目录
 RUN_HOME=$(dirname $(readlink -f "$0"))
 #加载配置文件
 CLASS_PATH=.:$RUN_HOME/../conf
-#load apps jar
-#for v_i in `ls $RUN_HOME/../apps/*.jar`
-#do
-# CLASS_PATH=$CLASS_PATH:$v_i
-#done
+
 # load libs jar
 for v_i in `ls $RUN_HOME/../libs/*.jar`
 do
@@ -26,7 +20,7 @@ CLASS_PATH=$CLASS_PATH:$CLASSPATH
 # 程序启动类
 class_name="@script.mainClass@"
 #JVM参数
-#JVM_OPTS="-Djava.library.path=libc:/usr/local/apr/lib/ -Dspring.profiles.active=dev"
+#JVM_OPTS="-Djava.library.path=libc:/usr/local/apr/lib/ -Xms1024m -Xmx2048m"
 #启动参数
 #PARAM_OPTS="--server.port=10080"
 #远程调试参数
