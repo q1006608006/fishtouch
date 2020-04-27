@@ -10,6 +10,7 @@ public class Constant {
     public static final String MAIN_PATH = "src/main";
     public static final String ASSEMBLY_PATH = "src/main/assembly";
     public static final String SCRIPTS_PATH = "src/main/script";
+    public static final String RESOURCES_PATH = "src/main/resources";
 
     public static final String ASSEMBLY_FILE_PATH = "src/main/assembly/assembly.xml";
 

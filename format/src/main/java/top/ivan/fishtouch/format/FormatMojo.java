@@ -98,6 +98,7 @@ public class FormatMojo extends AbstractMojo {
 
         //安装assembly文件夹及assembly.xml文件
         FileUtil.createDirIfEmpty(Paths.get(Constant.ASSEMBLY_PATH));
+        FileUtil.writeIfNotExists(Paths.get(Constant.ASSEMBLY_FILE_PATH), resourceManager.getAssembly());
 
     }
 
