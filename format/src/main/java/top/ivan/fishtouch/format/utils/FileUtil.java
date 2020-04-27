@@ -1,16 +1,10 @@
 package top.ivan.fishtouch.format.utils;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.RandomAccessFile;
+import java.io.*;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.List;
 
 /**
  * @author Ivan
@@ -31,12 +25,21 @@ public class FileUtil {
     }
 
     public static String loadResourceAsString(String name) throws URISyntaxException, IOException {
-        URL fileURL = FileUtil.class.getClassLoader().getResource(name);
-        if (null == fileURL) {
+        InputStream stream = FileUtil.class.getClassLoader().getResourceAsStream(name);
+        if (null == stream) {
             throw new FileNotFoundException(String.format("未找到资源: 'classes/%s'", name));
         }
-        List<String> lines = Files.readAllLines(Paths.get(fileURL.toURI()), Charset.defaultCharset());
-        return String.join("\n", lines);
+        BufferedInputStream in = new BufferedInputStream(stream);
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        int t;
+        while ((t = in.read()) > 0) {
+            out.write(t);
+        }
+
+        out.close();
+        in.close();
+
+        return out.toString(Charset.defaultCharset().toString());
     }
 
     public static void writeToFile(Path path, String source) throws IOException {

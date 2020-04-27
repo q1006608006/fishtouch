@@ -3,7 +3,6 @@ package top.ivan.fishtouch.format;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
@@ -30,13 +29,16 @@ public class FormatMojo extends AbstractMojo {
     private boolean createExample;
 
     @Parameter
-    private ProfileConfig environment;
+    private ProfileConfig environment = new ProfileConfig();
 
-    @Parameter(defaultValue = "libs")
+    @Parameter(defaultValue = "src/main/libs")
     private List<String> extLibs;
 
     @Parameter(defaultValue = "springboot")
     private String shellType;
+
+    @Parameter(defaultValue = "${mainClass}")
+    private String mainClass;
 
     @Parameter(
             defaultValue = "${project}",
@@ -45,12 +47,16 @@ public class FormatMojo extends AbstractMojo {
     )
     private MavenProject project;
 
-
-    @Component
     private ResourceManager resourceManager;
+
+    private void init() {
+        resourceManager = new ResourceManager(mainClass, environment, project, extLibs);
+    }
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
+        //初始化
+        init();
 
         //安装环境文件夹及对应文件
         if (environment != null) {
@@ -61,7 +67,7 @@ public class FormatMojo extends AbstractMojo {
             }
         }
 
-        //todo: 安装脚本、assembly资源、libs文件夹
+        //安装脚本、assembly资源、libs文件夹
         try {
             installResources();
         } catch (Exception e) {

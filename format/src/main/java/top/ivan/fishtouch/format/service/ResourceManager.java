@@ -1,7 +1,6 @@
 package top.ivan.fishtouch.format.service;
 
 import com.google.common.base.Strings;
-import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.util.StringUtils;
 import top.ivan.fishtouch.format.Constant;
@@ -37,18 +36,20 @@ public class ResourceManager {
 
     private static final HashMap<String, String> exampleMap = new HashMap<>();
 
-    @Parameter(defaultValue = "${mainClass}")
     private String mainClass;
 
-    @Parameter
     private ProfileConfig environment;
 
-    @Parameter(
-            defaultValue = "${project}",
-            readonly = true,
-            required = true
-    )
     private MavenProject project;
+
+    private List<String> extLibs;
+
+    public ResourceManager(String mainClass, ProfileConfig environment, MavenProject project, List<String> extLibs) {
+        this.mainClass = mainClass;
+        this.environment = environment;
+        this.project = project;
+        this.extLibs = extLibs;
+    }
 
     public String getProfile(String env) throws IOException, URISyntaxException {
         String src = loadExample(Constant.PROFILE_EXAMPLE);
@@ -79,7 +80,7 @@ public class ResourceManager {
         return loadExample(Constant.SCRIPT_BAT_COMMON_EXAMPLE).replace(SCRIPT_MAIN_CLASS, mainClass);
     }
 
-    public String getAssembly(List<String> extLibs) throws IOException, URISyntaxException {
+    public String getAssembly() throws IOException, URISyntaxException {
         String exampleSrc = loadExample(Constant.ASSEMBLY_EXAMPLE);
 
         //获取关联路径
@@ -95,7 +96,7 @@ public class ResourceManager {
 
         for (String relative : paths) {
             AssemblyFileSet fs = new AssemblyFileSet();
-            fs.setDirectory(Paths.get(relative, "${profile.env}").toString());
+            fs.setDirectory(Paths.get(relative, "${profile.env}").toString().replace("\\","/"));
             fs.setOutputDirectory("conf");
             fs.setFiltered(false);
             fs.setExcludes(Collections.singletonList(environment.getProfileName()));
@@ -105,8 +106,8 @@ public class ResourceManager {
         String assemblyProfilesText = String.join("", fileSets);
         fileSets.clear();
 
-        if (null != extLibs) {
-            for (String extLib : extLibs) {
+        if (null != this.extLibs) {
+            for (String extLib : this.extLibs) {
                 AssemblyFileSet fs = new AssemblyFileSet();
                 fs.setDirectory(extLib);
                 fs.setOutputDirectory("libs");
@@ -205,7 +206,7 @@ public class ResourceManager {
 
         @Override
         public String toString() {
-            StringBuilder builder = new StringBuilder(getTabStr("<fileSet>", rootTab));
+            StringBuilder builder = new StringBuilder(getTabStr("<fileSet>", rootTab)).append('\n');
             if (StringUtils.isNotBlank(directory)) {
                 builder.append(getTabStr(getXmlElement("directory", directory), secTab)).append('\n');
             }

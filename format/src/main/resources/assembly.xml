@@ -49,10 +49,10 @@
         </fileSet>
 
         <!--    外部依赖jar包放置于./libs文件夹    -->
-        @assembly.extLibs@
+@assembly.extLibs@
 
         <!--    profile文件夹下除filter资源文件以外的文件放置于./conf文件夹    -->
-        @assembly.profiles@
+@assembly.profiles@
 
 
     </fileSets>
