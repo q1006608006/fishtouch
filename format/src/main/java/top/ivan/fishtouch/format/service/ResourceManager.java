@@ -84,13 +84,7 @@ public class ResourceManager {
         String exampleSrc = loadExample(Constant.ASSEMBLY_EXAMPLE);
 
         //获取关联路径
-        List<String> paths = new ArrayList<>();
-        if (null != environment.getRelative()) {
-            paths.addAll(environment.getRelative());
-        }
-        if (StringUtils.isNotBlank(environment.getLocation())) {
-            paths.add(environment.getLocation());
-        }
+        List<String> paths = getEnvBaseLocations();
 
         List<String> fileSets = new ArrayList<>();
 
@@ -121,10 +115,67 @@ public class ResourceManager {
         return exampleSrc.replace(ASSEMBLY_EXT_LIBS, assemblyExtLibsText).replace(ASSEMBLY_PROFILE, assemblyProfilesText);
     }
 
+
+    /*
+     * pom example file
+     *
+     */
+
+    public static final String POM_EXT_RESOURCE = "@pom.extResource@";
+    public static final String POM_BUILD_FILTERS = "@pom.build.filters@";
+    public static final String POM_ASSEMBLY_FILTERS = "@pom.assembly.filters@";
+    public static final String POM_ASSEMBLY_DESCRIPTOR = "@pom.assembly.descriptor@";
+    public static final String POM_PROFILES = "@pom.profiles@";
+
     public String getPom() throws IOException, URISyntaxException {
         String exampleSrc = loadExample(Constant.POM_EXAMPLE);
+        List<String> extResourceBodies = new ArrayList<>();
+        List<String> filters = new ArrayList<>();
 
         //todo 替换@pom.extResource@
+        List<String> allLocation = getEnvBaseLocations();
+
+        for (String location : allLocation) {
+            PomResource pr = new PomResource();
+            pr.setDirectory(location + "/${profile.env}");
+            pr.setFiltering(false);
+            pr.setExcludes(Collections.singletonList(environment.getProfileName()));
+            extResourceBodies.add(pr.toString(3));
+
+            filters.add(location + "/${profile.env}/" + environment.getProfileName());
+        }
+        exampleSrc = exampleSrc.replace(POM_EXT_RESOURCE, String.join("", extResourceBodies));
+        extResourceBodies.clear();
+
+        //todo 替换@pom.build.filters@ 3tab
+        StringBuilder bodyBuilder = new StringBuilder();
+        for (String filter : filters) {
+            bodyBuilder.append(getTabStr(getXmlElement("filter", filter), 3)).append("\n");
+        }
+        exampleSrc = exampleSrc.replace(POM_BUILD_FILTERS, bodyBuilder.toString());
+
+        //todo 替换@pom.assembly.filters@  6tab
+        bodyBuilder = new StringBuilder();
+        for (String filter : filters) {
+            bodyBuilder.append(getTabStr(getXmlElement("filter", filter), 6)).append("\n");
+        }
+        exampleSrc = exampleSrc.replace(POM_ASSEMBLY_FILTERS, bodyBuilder.toString());
+
+        //todo 替换@pom.assembly.descriptor@
+        exampleSrc = exampleSrc.replace(POM_ASSEMBLY_DESCRIPTOR, getTabStr(getXmlElement("descriptor", Constant.ASSEMBLY_FILE_PATH), 6));
+
+        //todo 替换@pom.profiles@
+
+        List<String> profileBodies = new ArrayList<>();
+        for (String env : environment.getEnvs()) {
+            PomProfile ppf = new PomProfile(env, "dev".equals(env));
+            profileBodies.add(ppf.toString(2));
+        }
+
+        return exampleSrc.replace(POM_PROFILES, String.join("", profileBodies));
+    }
+
+    private List<String> getEnvBaseLocations() {
         List<String> allLocation = new ArrayList<>();
         if (null != environment.getRelative()) {
             allLocation.addAll(environment.getRelative());
@@ -132,24 +183,7 @@ public class ResourceManager {
         if (StringUtils.isNotBlank(environment.getLocation())) {
             allLocation.add(environment.getLocation());
         }
-
-        List<String> resourceTexts = new ArrayList<>();
-        for (String location : allLocation) {
-            PomResource pr = new PomResource(3);
-            pr.setDirectory(location);
-            pr.setFiltering(false);
-        }
-
-        PomResource pr = new PomResource(3);
-        pr.setDirectory(null);
-
-        //todo 替换@pom.filters@ 3个tab
-
-        //todo 替换@pom.filters@ 4个tab
-
-        //todo 替换@pom.assembly.descriptor@
-
-        //todo 替换@pom.profiles@
+        return allLocation;
     }
 
     private static String loadExample(String name) throws IOException, URISyntaxException {
@@ -171,9 +205,8 @@ public class ResourceManager {
 
 
     private static class AssemblyFileSet {
-        public int rootTab = 2;
-        public int secTab = rootTab + 1;
-        public int trdTab = secTab + 1;
+
+        private int rootTab = 2;
 
         private String directory;
         private String outputDirectory;
@@ -183,10 +216,11 @@ public class ResourceManager {
         private List<String> includes;
         private String lineEnding;
 
+        public AssemblyFileSet() {
+        }
+
         public AssemblyFileSet(int rootTab) {
             this.rootTab = rootTab;
-            secTab = rootTab + 1;
-            trdTab = secTab + 1;
         }
 
         public String getDirectory() {
@@ -247,6 +281,14 @@ public class ResourceManager {
 
         @Override
         public String toString() {
+            return toString(rootTab);
+        }
+
+        public String toString(int tabCount) {
+            int rootTab = tabCount;
+            int secTab = rootTab + 1;
+            int trdTab = secTab + 1;
+
             StringBuilder builder = new StringBuilder(getTabStr("<fileSet>", rootTab)).append('\n');
             if (StringUtils.isNotBlank(directory)) {
                 builder.append(getTabStr(getXmlElement("directory", directory), secTab)).append('\n');
@@ -285,16 +327,16 @@ public class ResourceManager {
     private static class PomResource {
 
         public int rootTab = 3;
-        public int secTab = rootTab + 1;
-        public int trdTab = secTab + 1;
 
         private String directory;
         private boolean filtering;
+        private List<String> excludes;
+
+        public PomResource() {
+        }
 
         public PomResource(int rootTab) {
             this.rootTab = rootTab;
-            secTab = rootTab + 1;
-            trdTab = secTab + 1;
         }
 
         public String getDirectory() {
@@ -313,17 +355,81 @@ public class ResourceManager {
             this.filtering = filtering;
         }
 
+        public List<String> getExcludes() {
+            return excludes;
+        }
+
+        public void setExcludes(List<String> excludes) {
+            this.excludes = excludes;
+        }
+
         @Override
         public String toString() {
+            return toString(rootTab);
+        }
+
+        public String toString(int tabCount) {
+            int rootTab = tabCount;
+            int secTab = rootTab + 1;
+            int trdTab = secTab + 1;
+
+
             StringBuilder builder = new StringBuilder();
             builder.append(getTabStr("<resource>", rootTab)).append('\n');
 
             builder.append(getTabStr(getXmlElement("filtering", filtering), secTab)).append('\n');
             builder.append(getTabStr(getXmlElement("directory", directory), secTab)).append('\n');
 
+            if (excludes != null) {
+                builder.append(getTabStr("<excludes>", secTab)).append("\n");
+                for (String exclude : excludes) {
+                    builder.append(getTabStr(getXmlElement("exclude", exclude), trdTab)).append("\n");
+                }
+                builder.append(getTabStr("</excludes>", secTab)).append("\n");
+            }
+
             builder.append(getTabStr("</resource>", rootTab)).append('\n');
             return builder.toString();
         }
+    }
+
+    private static class PomProfile {
+
+        private String env;
+
+        private boolean active;
+
+        public PomProfile(String env, boolean active) {
+            this.env = env;
+            this.active = active;
+        }
+
+        public String toString() {
+            return toString(2);
+        }
+
+        public String toString(int rootTab) {
+            int secTab = rootTab + 1;
+            int trdTab = secTab + 1;
+
+            StringBuilder bd = new StringBuilder();
+
+            bd.append(getTabStr("<profile>", rootTab)).append("\n");
+            bd.append(getTabStr(getXmlElement("id", env), secTab)).append("\n");
+            bd.append(getTabStr("<properties>", secTab)).append("\n");
+            bd.append(getTabStr(getXmlElement("profile.env", env), trdTab)).append("\n");
+            bd.append(getTabStr("</properties>", secTab)).append("\n");
+
+            if (active) {
+                bd.append(getTabStr("<activation>", secTab)).append("\n");
+                bd.append(getTabStr(getXmlElement("activeByDefault", "true"), trdTab)).append("\n");
+                bd.append(getTabStr("</activation>", secTab)).append("\n");
+            }
+            bd.append(getTabStr("</profile>", rootTab)).append("\n");
+
+            return bd.toString();
+        }
+
     }
 
 }

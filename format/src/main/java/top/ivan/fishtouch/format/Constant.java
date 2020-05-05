@@ -9,14 +9,16 @@ public class Constant {
     //target path
     public static final String MAIN_PATH = "src/main";
     public static final String ASSEMBLY_PATH = "src/main/assembly";
-    public static final String SCRIPTS_PATH = "src/main/script";
+    public static final String SCRIPTS_PATH = "src/main/scripts";
     public static final String RESOURCES_PATH = "src/main/resources";
 
     public static final String ASSEMBLY_FILE_PATH = "src/main/assembly/assembly.xml";
 
-    public static final String SCRIPTS_RUN_PATH = "src/main/script/run.sh";
-    public static final String SCRIPTS_STOP_PATH = "src/main/script/stop.sh";
-    public static final String SCRIPTS_BAT_PATH = "src/main/script/run.bat";
+    public static final String SCRIPTS_RUN_PATH = "src/main/scripts/run.sh";
+    public static final String SCRIPTS_STOP_PATH = "src/main/scripts/stop.sh";
+    public static final String SCRIPTS_BAT_PATH = "src/main/scripts/run.bat";
+
+    public static final String EXAMPLE_POM_PATH = "pom.xml.example";
 
 
     // example file

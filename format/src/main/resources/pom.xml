@@ -14,23 +14,19 @@
 
     <build>
         <resources>
+            <!-- 默认资源文件，可以替换参数 -->
             <resource>
                 <filtering>true</filtering>
                 <directory>${project.basedir}/src/main/resources</directory>
             </resource>
-<!--            <resource>
-                <directory>${project.basedir}/src/main/profiles/${profile.env}</directory>
-                <filtering>false</filtering>
-                <excludes>
-                    <exclude>application.properties</exclude>
-                </excludes>
-            </resource>-->
-            @pom.extResource@
+
+            <!-- 环境配置文件，不可替换参数 -->
+@pom.extResource@
         </resources>
 
         <filters>
-<!--            <filter>${project.basedir}/src/main/profiles/${profile.env}/application.properties</filter>-->
-            @pom.filters@
+            <!-- 环境参数配置文件 -->
+@pom.build.filters@
         </filters>
 
         <plugins>
@@ -49,12 +45,12 @@
                 <configuration>
                     <appendAssemblyId>false</appendAssemblyId>
                     <filters>
-                        <!--<filter>${project.basedir}/src/main/profiles/${profile.env}/application.properties</filter>-->
-                        @pom.filters@
+                        <!-- 环境参数配置文件 -->
+@pom.assembly.filters@
                     </filters>
                     <descriptors>
-                        @pom.assembly.descriptor@
-                        <!--<descriptor>src/main/assembly/assembly.xml</descriptor>-->
+                        <!-- assembly文件 -->
+@pom.assembly.descriptor@
                     </descriptors>
                     <finalName>${project.build.finalName}-${profile.env}</finalName>
                 </configuration>
@@ -62,34 +58,7 @@
         </plugins>
     </build>
     <profiles>
-        @pom.profiles@
-
-<!--        <profile>
-            <id>dev</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
-            <properties>
-                <profile.env>dev</profile.env>
-            </properties>
-        </profile>
-        <profile>
-            <id>test</id>
-            <properties>
-                <profile.env>test</profile.env>
-            </properties>
-        </profile>
-        <profile>
-            <id>hw</id>
-            <properties>
-                <profile.env>hw</profile.env>
-            </properties>
-        </profile>
-        <profile>
-            <id>prod</id>
-            <properties>
-                <profile.env>prod</profile.env>
-            </properties>
-        </profile>-->
+        <!-- 环境参数 -->
+@pom.profiles@
     </profiles>
 </project>

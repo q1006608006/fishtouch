@@ -18,7 +18,7 @@ done
 CLASS_PATH=$CLASS_PATH:$CLASSPATH
 
 # 程序启动类
-class_name="@script.mainClass@"
+class_name="@mainClass@"
 #JVM参数
 #JVM_OPTS="-Djava.library.path=libc:/usr/local/apr/lib/ -Xms1024m -Xmx2048m"
 #启动参数

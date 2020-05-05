@@ -30,14 +30,18 @@
             <outputDirectory>bin</outputDirectory>
             <fileMode>755</fileMode>
             <filtered>true</filtered>
-            <includes>*.sh</includes>
+            <includes>
+                <include>*.sh</include>
+            </includes>
             <lineEnding>unix</lineEnding>
         </fileSet>
         <fileSet>
             <directory>src/main/scripts</directory>
             <outputDirectory>bin</outputDirectory>
             <filtered>true</filtered>
-            <includes>*.bat</includes>
+            <includes>
+                <include>*.bat</include>
+            </includes>
             <lineEnding>windows</lineEnding>
         </fileSet>
 

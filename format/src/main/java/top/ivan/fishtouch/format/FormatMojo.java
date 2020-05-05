@@ -108,8 +108,8 @@ public class FormatMojo extends AbstractMojo {
 
     }
 
-    private void installExample() {
-
+    private void installExample() throws IOException, URISyntaxException {
+        FileUtil.overrideFile(Paths.get(Constant.EXAMPLE_POM_PATH),resourceManager.getPom());
     }
 
     private void installEnvs() throws IOException, URISyntaxException {

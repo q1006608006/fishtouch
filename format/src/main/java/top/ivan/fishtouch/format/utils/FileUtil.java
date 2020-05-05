@@ -58,4 +58,9 @@ public class FileUtil {
         }
     }
 
+    public static void overrideFile(Path path,String source) throws IOException {
+            Files.deleteIfExists(path);
+            writeToFile(path,source);
+    }
+
 }
