@@ -37,4 +37,7 @@ public class Constant {
 
     public static final String POM_EXAMPLE = "pom.xml";
 
+    public static final String ADDITION_LIST = "addition/addition.list";
+    public static final String ADDITION_PATH = "addition";
+
 }

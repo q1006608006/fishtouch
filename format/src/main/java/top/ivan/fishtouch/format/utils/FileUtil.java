@@ -2,9 +2,12 @@ package top.ivan.fishtouch.format.utils;
 
 import java.io.*;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Enumeration;
 
 /**
  * @author Ivan
@@ -54,13 +57,23 @@ public class FileUtil {
 
     public static void writeIfNotExists(Path path, String source) throws IOException {
         if (!Files.exists(path)) {
+            if(!Files.exists(path.getParent())) {
+                Files.createDirectory(path.getParent());
+            }
             writeToFile(path, source);
         }
     }
 
-    public static void overrideFile(Path path,String source) throws IOException {
-            Files.deleteIfExists(path);
-            writeToFile(path,source);
+    public static void overrideFile(Path path, String source) throws IOException {
+        Files.deleteIfExists(path);
+        writeToFile(path, source);
+    }
+
+    public static void writeExampleIfExists(Path path, String source) throws IOException {
+        if (Files.exists(path)) {
+            path = Paths.get(path.toString() + ".example");
+        }
+        overrideFile(path, source);
     }
 
 }

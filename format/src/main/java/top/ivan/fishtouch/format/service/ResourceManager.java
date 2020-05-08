@@ -53,7 +53,7 @@ public class ResourceManager {
 
     public String getProfile(String env) throws IOException, URISyntaxException {
         String src = loadExample(Constant.PROFILE_EXAMPLE);
-        return src.replace(PROFILE_ENV, env);
+        return src.replace(PROFILE_ENV, env).replace(SCRIPT_MAIN_CLASS,mainClass);
     }
 
     public String getRun(String type) throws IOException, URISyntaxException {
@@ -132,7 +132,7 @@ public class ResourceManager {
         List<String> extResourceBodies = new ArrayList<>();
         List<String> filters = new ArrayList<>();
 
-        //todo 替换@pom.extResource@
+        //替换@pom.extResource@
         List<String> allLocation = getEnvBaseLocations();
 
         for (String location : allLocation) {
@@ -142,30 +142,30 @@ public class ResourceManager {
             pr.setExcludes(Collections.singletonList(environment.getProfileName()));
             extResourceBodies.add(pr.toString(3));
 
+            filters.add(location +"/" + environment.getProfileName());
             filters.add(location + "/${profile.env}/" + environment.getProfileName());
         }
         exampleSrc = exampleSrc.replace(POM_EXT_RESOURCE, String.join("", extResourceBodies));
         extResourceBodies.clear();
 
-        //todo 替换@pom.build.filters@ 3tab
+        //替换@pom.build.filters@ 3tab
         StringBuilder bodyBuilder = new StringBuilder();
         for (String filter : filters) {
             bodyBuilder.append(getTabStr(getXmlElement("filter", filter), 3)).append("\n");
         }
         exampleSrc = exampleSrc.replace(POM_BUILD_FILTERS, bodyBuilder.toString());
 
-        //todo 替换@pom.assembly.filters@  6tab
+        //替换@pom.assembly.filters@  6tab
         bodyBuilder = new StringBuilder();
         for (String filter : filters) {
             bodyBuilder.append(getTabStr(getXmlElement("filter", filter), 6)).append("\n");
         }
         exampleSrc = exampleSrc.replace(POM_ASSEMBLY_FILTERS, bodyBuilder.toString());
 
-        //todo 替换@pom.assembly.descriptor@
+        //替换@pom.assembly.descriptor@
         exampleSrc = exampleSrc.replace(POM_ASSEMBLY_DESCRIPTOR, getTabStr(getXmlElement("descriptor", Constant.ASSEMBLY_FILE_PATH), 6));
 
-        //todo 替换@pom.profiles@
-
+        //替换@pom.profiles@
         List<String> profileBodies = new ArrayList<>();
         for (String env : environment.getEnvs()) {
             PomProfile ppf = new PomProfile(env, "dev".equals(env));

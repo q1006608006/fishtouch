@@ -30,19 +30,7 @@
             <outputDirectory>bin</outputDirectory>
             <fileMode>755</fileMode>
             <filtered>true</filtered>
-            <includes>
-                <include>*.sh</include>
-            </includes>
             <lineEnding>unix</lineEnding>
-        </fileSet>
-        <fileSet>
-            <directory>src/main/scripts</directory>
-            <outputDirectory>bin</outputDirectory>
-            <filtered>true</filtered>
-            <includes>
-                <include>*.bat</include>
-            </includes>
-            <lineEnding>windows</lineEnding>
         </fileSet>
 
         <!--    项目配置文件放置于./conf文件夹    -->
@@ -57,7 +45,6 @@
 
         <!--    profile文件夹下除filter资源文件以外的文件放置于./conf文件夹    -->
 @assembly.profiles@
-
 
     </fileSets>
 </assembly>

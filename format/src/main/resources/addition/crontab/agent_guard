@@ -1,0 +1,148 @@
+. ~/.bash_profile
+source /etc/profile
+#该脚本所在目录
+RUN_HOME=$(dirname $(readlink -f "$0"))
+
+#获取当前脚本名称
+job_name="${0##*/}"
+#读取配置文件
+read_config()
+{
+  eval `sed -n '/=/p' "$RUN_HOME/${job_name}.ini"`
+  
+  if [ "$?" -ne 0 ];then
+    echo "read job config error!">> $RUN_HOME/process_guard.log
+    exit 0
+  fi
+}
+
+#判断进程是否存在
+judge_process_exist()
+{
+  #如果是java进程
+  if [ "$process_type" == "1" ];then
+    jps -ml|grep -w "$process_name"
+    if [ "$?" -eq 0 ];then
+      return 1
+    else
+      return 0
+    fi
+  #如果是C++进程
+  else
+    ps -ef|grep -w `whoami`|grep -w "$process_name"|grep -v grep
+    if [ "$?" -eq 0 ];then
+      return 1
+    else
+      return 0
+    fi
+  fi
+}
+
+
+#判断守护的进程是否需要重启
+judge_restart()
+{
+  #判断进程是否存在
+  judge_process_exist
+  if [ "$?" -eq 1 ];then
+    return 0
+  fi
+  
+  if [ -d "$RUN_HOME" ];then
+    cd $RUN_HOME
+  else
+    mkdir "$RUN_HOME"
+  fi
+  
+  if [ -f "Process_exitnum.log" ];then
+    current_exit_num=`awk -F= -v p_name="$process_name" '{if($1==p_name) print $2}' Process_exitnum.log`
+    if [ "$current_exit_num" = "" ];then
+      current_exit_num=0
+    fi
+  else
+    touch Process_exitnum.log
+    return 1
+  fi
+
+  if [ "$current_exit_num" -le "$exit_num" ];then
+    return 1
+  else
+    return 0
+  fi
+
+  return 0 
+}
+
+
+#改写文件中的退出次数
+write_back_exitnum()
+{
+  local exitnum
+  
+  exitnum=$1
+  
+  grep "$process_name" Process_exitnum.log
+  if [ $? == 0 ];then
+    sed -i "s/\($process_name=\)\([0-9]\+\)/\1$exitnum/g" Process_exitnum.log
+  else
+    echo "$process_name=0">>Process_exitnum.log
+  fi
+}
+
+
+#重启进程
+restart_process()
+{ 
+  cd $process_home
+  eval `echo "$start_cmd"`
+  cd -
+
+  if [ "$?" -eq 0 ];then
+    write_back_exitnum 0
+    echo "`date +"%Y%m%d%H%M%S"`: Restart $process_name sucess.">>"$RUN_HOME/process_guard.log"
+  else
+    process_exitnum=`awk -F= -v p_name="$process_name" '{if($1==p_name){$2++;print $2}}' Process_exitnum.log`
+    #回写文件中的退出次数
+    write_back_exitnum $process_exitnum
+    echo "`date +"%Y%m%d%H%M%S"`: Restart $process_name failed. At present, restart failed times is equal to the number $process_exitnum" >>"$RUN_HOME/process_guard.log"
+  fi
+}
+
+
+#单节点守护流程
+do_work()
+{
+  eval `echo 'process_type=${process_type_'$1'}'`
+  eval `echo 'process_name=${process_name_'$1'}'`
+  eval `echo 'start_cmd=${start_cmd_'$1'}'`
+  eval `echo 'process_home=${process_home_'$1'}'`
+ 
+  #判断进程是否需要重启
+  judge_restart
+  if [ "$?" -eq 1 ];then
+    #重启进程
+    restart_process
+  fi
+}
+
+
+#主函数
+main()
+{
+  local node_serial=1
+  
+  read_config
+  
+  while [ "$node_serial" -le "$guard_node_num" ]
+  do
+    do_work "$node_serial"
+    node_serial=`expr $node_serial + 1`
+  done
+}
+
+
+#执行主流程
+main
+
+exit 0
+

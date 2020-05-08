@@ -1,0 +1,1 @@
+echo "*/1 * * * * @scriptHome@/crontab/agent_guard" | crontab
