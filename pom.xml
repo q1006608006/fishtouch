@@ -9,6 +9,8 @@
     <version>0.2.0</version>
     <modules>
         <module>format</module>
+        <module>deploy</module>
+        <module>auto-health-code</module>
     </modules>
 
     <packaging>pom</packaging>

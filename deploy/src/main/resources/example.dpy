@@ -1,0 +1,12 @@
+HTTP://${host}:${port}
+{{
+
+}}
+
+SCP target/anicert.tar.gz root@172.16.40.201:~/scp
+SSH root@172.16.40.201
+{
+    cd /home;
+    tar -xzvf ${final.name};
+
+}
