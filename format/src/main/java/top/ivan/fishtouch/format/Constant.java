@@ -8,11 +8,11 @@ package top.ivan.fishtouch.format;
 public class Constant {
     //target path
     public static final String MAIN_PATH = "src/main";
-    public static final String ASSEMBLY_PATH = "src/main/assembly";
+    public static final String ASSEMBLY_PATH = "assembly";
     public static final String SCRIPTS_PATH = "src/main/scripts";
     public static final String RESOURCES_PATH = "src/main/resources";
 
-    public static final String ASSEMBLY_FILE_PATH = "src/main/assembly/assembly.xml";
+    public static final String ASSEMBLY_FILE_PATH = "assembly/assembly.xml";
 
     public static final String SCRIPTS_RUN_PATH = "src/main/scripts/run.sh";
     public static final String SCRIPTS_STOP_PATH = "src/main/scripts/stop.sh";
@@ -23,6 +23,7 @@ public class Constant {
 
     // example file
     public static final String PROFILE_EXAMPLE = "profile.properties";
+    public static final String PROFILE_BASE_EXAMPLE = "baseProfile.properties";
 
     public static final String ASSEMBLY_EXAMPLE = "assembly.xml";
 

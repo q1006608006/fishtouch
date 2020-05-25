@@ -53,7 +53,12 @@ public class ResourceManager {
 
     public String getProfile(String env) throws IOException, URISyntaxException {
         String src = loadExample(Constant.PROFILE_EXAMPLE);
-        return src.replace(PROFILE_ENV, env).replace(SCRIPT_MAIN_CLASS,mainClass);
+        return src.replace(PROFILE_ENV, env);
+    }
+
+    public String getBaseProfile() throws IOException, URISyntaxException {
+        String src = loadExample(Constant.PROFILE_BASE_EXAMPLE);
+        return src.replace(SCRIPT_MAIN_CLASS,mainClass);
     }
 
     public String getRun(String type) throws IOException, URISyntaxException {

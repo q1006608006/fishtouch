@@ -115,11 +115,11 @@ public class FormatMojo extends AbstractMojo {
         List<String> filePaths = Arrays.asList(src.split("\n|\r|\r\n"));
 
         for (String filePath : filePaths) {
-            if(StringUtils.isEmpty(filePath)) {
+            if (StringUtils.isEmpty(filePath)) {
                 continue;
             }
             FileUtil.writeIfNotExists(Paths.get(Constant.SCRIPTS_PATH, filePath)
-                    , FileUtil.loadResourceAsString(Paths.get(Constant.ADDITION_PATH, filePath).toString().replace("\\","/")));
+                    , FileUtil.loadResourceAsString(Paths.get(Constant.ADDITION_PATH, filePath).toString().replace("\\", "/")));
         }
     }
 
@@ -157,7 +157,7 @@ public class FormatMojo extends AbstractMojo {
                 FileUtil.writeIfNotExists(profilePath, resourceManager.getProfile(env));
             }
 
-            FileUtil.writeIfNotExists(Paths.get(baseDirPath.toString(), profileName), resourceManager.getProfile(Arrays.toString(environment.getEnvs().toArray())));
+            FileUtil.writeIfNotExists(Paths.get(baseDirPath.toString(), profileName), resourceManager.getBaseProfile());
         }
 
     }
