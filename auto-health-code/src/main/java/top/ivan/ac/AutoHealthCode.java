@@ -71,26 +71,6 @@ public class AutoHealthCode {
         }
     }
 
-    public static void main(String[] args) throws IOException {
-        init();
-
-        LocalTime markTime = LocalTime.parse(markTimeStr);
-        ScheduledExecutorService executor = Executors.newScheduledThreadPool(2);
-
-        long nextStartTime;
-        LocalDateTime todayMarkTime = LocalDate.now().atTime(markTime);
-        if (todayMarkTime.isAfter(LocalDateTime.now())) {
-            nextStartTime = getSecond(todayMarkTime) - getSecond(LocalDateTime.now());
-        } else {
-            nextStartTime = getSecond(todayMarkTime.plusDays(1)) - getSecond(LocalDateTime.now());
-        }
-
-
-        System.out.println("下次启动时间: " + nextStartTime);
-        executor.scheduleAtFixedRate(new TaskRunner(), nextStartTime, 60 * 60 * 24, TimeUnit.SECONDS);
-
-    }
-
     public static Queue<SchTask> getRandomTask(List<SchTask> src) {
         int all = src.size();
         Integer[] group = new Integer[all];
@@ -143,21 +123,28 @@ public class AutoHealthCode {
 
         @Override
         public void run() {
-            Queue<SchTask> taskQueue = getRandomTask(baseTaskList);
-            long finalTime = System.currentTimeMillis() + randomRange * 1000;
-            System.out.println("task数量: " + taskQueue.size());
-
-            while (taskQueue.size() > 0) {
-                SchTask task = taskQueue.poll();
+            try {
+                Queue<SchTask> taskQueue = getRandomTask(baseTaskList);
+                long finalTime = System.currentTimeMillis() + randomRange * 1000;
                 int free = ((Long) (finalTime - System.currentTimeMillis())).intValue() / (taskQueue.size() + 1);
-                long sleep = new Random().nextInt(free);
-                try {
-                    System.out.println("休眠 " + sleep / 1000);
-                    Thread.sleep(sleep);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+                if (free < 0) {
+                    free = 1;
                 }
-                execTask(task);
+                System.out.println("task数量: " + taskQueue.size());
+
+                while (taskQueue.size() > 0) {
+                    SchTask task = taskQueue.poll();
+                    long sleep = new Random().nextInt(free);
+                    try {
+                        System.out.println("休眠 " + sleep / 1000);
+                        Thread.sleep(sleep);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    execTask(task);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }
     }
@@ -188,7 +175,7 @@ public class AutoHealthCode {
         }
     }
 
-    private static void send(String host, String body) throws IOException {
+    public static void send(String host, String body) throws IOException {
         URL url = new URL(host);
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 
@@ -203,18 +190,14 @@ public class AutoHealthCode {
         OutputStream os = conn.getOutputStream();
         os.write(body.getBytes());
 
-        if (conn.getResponseCode() < 300) {
-            BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+        BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
 
-            StringBuilder builder = new StringBuilder();
-            String temp;
-            while ((temp = reader.readLine()) != null) {
-                builder.append(temp).append("\n");
-            }
-            System.out.println(builder.toString());
-
-            reader.close();
+        StringBuilder builder = new StringBuilder();
+        String temp;
+        while ((temp = reader.readLine()) != null) {
+            builder.append(temp).append("\n");
         }
+        System.out.println(builder.toString());
 
         os.close();
         conn.disconnect();
@@ -222,5 +205,25 @@ public class AutoHealthCode {
 
     private static long getSecond(LocalDateTime time) {
         return time.toInstant(ZoneOffset.of("+8")).getEpochSecond();
+    }
+
+    public static void main(String[] args) throws IOException {
+        init();
+
+        LocalTime markTime = LocalTime.parse(markTimeStr);
+        ScheduledExecutorService executor = Executors.newScheduledThreadPool(2);
+
+        long nextStartTime;
+        LocalDateTime todayMarkTime = LocalDate.now().atTime(markTime);
+        if (todayMarkTime.isAfter(LocalDateTime.now())) {
+            nextStartTime = getSecond(todayMarkTime) - getSecond(LocalDateTime.now());
+        } else {
+            nextStartTime = getSecond(todayMarkTime.plusDays(1)) - getSecond(LocalDateTime.now());
+        }
+
+
+        System.out.println("下次启动时间: " + nextStartTime);
+        executor.scheduleAtFixedRate(new TaskRunner(), nextStartTime, 60 * 60 * 24, TimeUnit.SECONDS);
+
     }
 }
