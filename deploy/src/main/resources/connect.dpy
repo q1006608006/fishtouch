@@ -1,0 +1,8 @@
+connect {
+    h1 {
+        cmd ssh root@mc.yazif.top -P 123
+    }
+    h2 {
+        git@172.16.41.223
+    }
+}
