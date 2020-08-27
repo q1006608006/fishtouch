@@ -29,6 +29,8 @@ public class AutoHealthCode {
 
     private static List<SchTask> baseTaskList;
 
+    private final static Map<String, LocalDateTime> lastSuccessMap = new HashMap<>();
+
     public static void init() throws IOException {
         Properties prop = new Properties();
         InputStream resIn;
@@ -151,28 +153,35 @@ public class AutoHealthCode {
 
     private static void execTask(SchTask task) {
         for (int i = 0; i < 3; i++) {
-            try {
-                send(attachHost, task.getAttachBody());
+            if (testSuccessToday(task.getAttachBody())) {
+                System.out.println("success today: " + task.getAttachBody());
                 break;
-            } catch (IOException e) {
-                e.printStackTrace();
             }
-        }
-        try {
-            long sleepTime = (new Random().nextInt(15) + 10) * 1000;
-            System.out.println("sleep " + sleepTime / 1000);
-            Thread.sleep(sleepTime);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        for (int i = 0; i < 3; i++) {
             try {
+                send(attachHost, forAttach(task.getAttachBody()));
+                long sleepTime = (new Random().nextInt(15) + 10) * 1000;
+                System.out.println("sleep " + sleepTime / 1000);
+                Thread.sleep(sleepTime);
                 send(healthCodeHost, task.getHealthBody());
+
+                lastSuccessMap.put(task.getAttachBody(), LocalDateTime.now());
                 break;
-            } catch (IOException e) {
+            } catch (IOException | InterruptedException e) {
                 e.printStackTrace();
             }
         }
+    }
+
+    public static String forAttach(String attach) {
+        if (LocalDate.now().getDayOfWeek().getValue() > 5) {
+            return attach.replaceAll("\"returnWorkStatus\":\"1\"", "\"returnWorkStatus\":\"0\"");
+        }
+        return attach;
+    }
+
+    private static boolean testSuccessToday(String attachBody) {
+        LocalDateTime time = lastSuccessMap.get(attachBody);
+        return time != null && time.toLocalDate().isEqual(LocalDate.now());
     }
 
     public static void send(String host, String body) throws IOException {
@@ -210,20 +219,25 @@ public class AutoHealthCode {
     public static void main(String[] args) throws IOException {
         init();
 
-        LocalTime markTime = LocalTime.parse(markTimeStr);
-        ScheduledExecutorService executor = Executors.newScheduledThreadPool(2);
+        String[] times = markTimeStr.split(",");
 
-        long nextStartTime;
-        LocalDateTime todayMarkTime = LocalDate.now().atTime(markTime);
-        if (todayMarkTime.isAfter(LocalDateTime.now())) {
-            nextStartTime = getSecond(todayMarkTime) - getSecond(LocalDateTime.now());
-        } else {
-            nextStartTime = getSecond(todayMarkTime.plusDays(1)) - getSecond(LocalDateTime.now());
+        for (int i = 0; i < times.length; i++) {
+
+            String markTimeStr = times[i];
+            LocalTime markTime = LocalTime.parse(markTimeStr);
+            ScheduledExecutorService executor = Executors.newScheduledThreadPool(2);
+
+            long nextStartTime;
+            LocalDateTime todayMarkTime = LocalDate.now().atTime(markTime);
+            if (todayMarkTime.isAfter(LocalDateTime.now())) {
+                nextStartTime = getSecond(todayMarkTime) - getSecond(LocalDateTime.now());
+            } else {
+                nextStartTime = getSecond(todayMarkTime.plusDays(1)) - getSecond(LocalDateTime.now());
+            }
+
+            System.out.println("任务" + i + "启动时间: " + nextStartTime);
+            executor.scheduleAtFixedRate(new TaskRunner(), nextStartTime, 60 * 60 * 24, TimeUnit.SECONDS);
         }
-
-
-        System.out.println("下次启动时间: " + nextStartTime);
-        executor.scheduleAtFixedRate(new TaskRunner(), nextStartTime, 60 * 60 * 24, TimeUnit.SECONDS);
 
     }
 }
