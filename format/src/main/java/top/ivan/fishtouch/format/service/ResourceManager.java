@@ -58,12 +58,12 @@ public class ResourceManager {
 
     public String getBaseProfile() throws IOException, URISyntaxException {
         String src = loadExample(Constant.PROFILE_BASE_EXAMPLE);
-        return src.replace(SCRIPT_MAIN_CLASS,mainClass);
+        return src.replace(SCRIPT_MAIN_CLASS, mainClass);
     }
 
     public String getRun(String type) throws IOException, URISyntaxException {
         if ("springboot".equals(type)) {
-            return loadExample(Constant.SCRIPT_RUN_SPRINGBOOT_EXAMPLE).replace(SCRIPT_MAIN_JAR, project.getBuild().getFinalName());
+            return loadExample(Constant.SCRIPT_RUN_SPRINGBOOT_EXAMPLE).replace(SCRIPT_MAIN_JAR, project.getBuild().getFinalName() + ".jar");
         }
 
         return loadExample(Constant.SCRIPT_RUN_COMMON_EXAMPLE).replace(SCRIPT_MAIN_CLASS, mainClass);
@@ -79,7 +79,7 @@ public class ResourceManager {
 
     public String getBat(String type) throws IOException, URISyntaxException {
         if ("springboot".equals(type)) {
-            return loadExample(Constant.SCRIPT_BAT_SPRINGBOOT_EXAMPLE).replace(SCRIPT_MAIN_JAR, project.getBuild().getFinalName());
+            return loadExample(Constant.SCRIPT_BAT_SPRINGBOOT_EXAMPLE).replace(SCRIPT_MAIN_JAR, project.getBuild().getFinalName() + ".jar");
         }
 
         return loadExample(Constant.SCRIPT_BAT_COMMON_EXAMPLE).replace(SCRIPT_MAIN_CLASS, mainClass);
@@ -147,7 +147,7 @@ public class ResourceManager {
             pr.setExcludes(Collections.singletonList(environment.getProfileName()));
             extResourceBodies.add(pr.toString(3));
 
-            filters.add(location +"/" + environment.getProfileName());
+            filters.add(location + "/" + environment.getProfileName());
             filters.add(location + "/${profile.env}/" + environment.getProfileName());
         }
         exampleSrc = exampleSrc.replace(POM_EXT_RESOURCE, String.join("", extResourceBodies));
