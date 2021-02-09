@@ -100,7 +100,7 @@ public class FormatMojo extends AbstractMojo {
         //安装脚本文件
         FileUtil.writeIfNotExists(Paths.get(Constant.SCRIPTS_RUN_PATH), resourceManager.getRun(shellType));
 //        FileUtil.writeIfNotExists(Paths.get(Constant.SCRIPTS_STOP_PATH), resourceManager.getStop(shellType));
-//        FileUtil.writeIfNotExists(Paths.get(Constant.SCRIPTS_BAT_PATH), resourceManager.getBat(shellType));
+        FileUtil.writeIfNotExists(Paths.get(Constant.SCRIPTS_BAT_PATH), resourceManager.getBat(shellType));
         //安装额外脚本文件
         installAddition();
 

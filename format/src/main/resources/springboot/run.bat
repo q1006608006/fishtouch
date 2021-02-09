@@ -15,7 +15,7 @@ goto param
 :end
 
 set path=%path%;.;
-set app_jar=tools-1.0-SNAPSHOT.jar
+set app_jar=@script.mainJar@
 
 set script_path=%~dp0
 
