@@ -14,9 +14,110 @@
 
     <packaging>jar</packaging>
 
+    <dependencies>
+        <dependency>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-assembly-plugin</artifactId>
+            <version>3.1.0</version>
+        </dependency>
+    </dependencies>
 
     <build>
+        <resources>
+            <!-- 默认资源文件，可以替换参数 -->
+            <resource>
+                <filtering>true</filtering>
+                <directory>${project.basedir}/src/main/resources</directory>
+            </resource>
+
+            <!-- 环境配置文件，不可替换参数 -->
+            <resource>
+                <filtering>false</filtering>
+                <directory>src/main/profile/${profile.env}</directory>
+                <excludes>
+                    <exclude>profile.properties</exclude>
+                </excludes>
+            </resource>
+            <resource>
+                <filtering>false</filtering>
+                <directory>src/main/profile</directory>
+                <excludes>
+                    <exclude>profile.properties</exclude>
+                </excludes>
+                <includes>
+                    <include>*.*</include>
+                </includes>
+            </resource>
+            <resource>
+                <filtering>false</filtering>
+                <directory>../profiles/${profile.env}</directory>
+                <excludes>
+                    <exclude>profile.properties</exclude>
+                </excludes>
+            </resource>
+            <resource>
+                <filtering>false</filtering>
+                <directory>../profiles</directory>
+                <excludes>
+                    <exclude>profile.properties</exclude>
+                </excludes>
+                <includes>
+                    <include>*.*</include>
+                </includes>
+            </resource>
+
+        </resources>
+
+        <filters>
+            <!-- 环境参数配置文件 -->
+            <filter>../profiles/profile.properties</filter>
+            <filter>../profiles/${profile.env}/profile.properties</filter>
+            <filter>src/main/profile/profile.properties</filter>
+            <filter>src/main/profile/${profile.env}/profile.properties</filter>
+
+        </filters>
+
         <plugins>
+            <plugin>
+                <artifactId>maven-resources-plugin</artifactId>
+                <configuration>
+                    <delimiters>
+                        <delimiter>@</delimiter>
+                    </delimiters>
+                    <useDefaultDelimiters>false</useDefaultDelimiters>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>3.1.0</version>
+                <executions>
+                    <execution>
+                        <id>make-assembly</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <appendAssemblyId>false</appendAssemblyId>
+                    <filters>
+                        <!-- 环境参数配置文件 -->
+                        <filter>../profiles/profile.properties</filter>
+                        <filter>../profiles/${profile.env}/profile.properties</filter>
+                        <filter>src/main/profile/profile.properties</filter>
+                        <filter>src/main/profile/${profile.env}/profile.properties</filter>
+
+                    </filters>
+                    <descriptors>
+                        <!-- assembly文件 -->
+                        <descriptor>assembly/assembly.xml</descriptor>
+                    </descriptors>
+                    <finalName>${project.build.finalName}-${profile.env}</finalName>
+                </configuration>
+            </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -26,10 +127,42 @@
             </plugin>
 
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-resources-plugin</artifactId>
+                <groupId>top.ivan.fishtouch</groupId>
+                <artifactId>format</artifactId>
+                <version>0.2.0</version>
+                <configuration>
+                    <environment>
+                        <envs>dev,test,xa</envs>
+                        <relative>../profiles</relative>
+                    </environment>
+                </configuration>
             </plugin>
         </plugins>
     </build>
 
+    <profiles>
+        <!-- 环境参数 -->
+        <profile>
+            <id>dev</id>
+            <properties>
+                <profile.env>dev</profile.env>
+            </properties>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+        </profile>
+        <profile>
+            <id>test</id>
+            <properties>
+                <profile.env>test</profile.env>
+            </properties>
+        </profile>
+        <profile>
+            <id>xa</id>
+            <properties>
+                <profile.env>xa</profile.env>
+            </properties>
+        </profile>
+
+    </profiles>
 </project>

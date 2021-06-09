@@ -90,6 +90,7 @@ public class ResourceManager {
 
         //获取关联路径
         List<String> paths = getEnvBaseLocations();
+        Collections.reverse(paths);
 
         List<String> fileSets = new ArrayList<>();
 
@@ -99,9 +100,15 @@ public class ResourceManager {
             fs.setOutputDirectory("conf");
             fs.setFiltered(false);
             fs.setExcludes(Collections.singletonList(environment.getProfileName()));
-            fileSets.add(fs.toString());
-        }
 
+            //todo 新增 “包括base profile下的文件”
+            AssemblyFileSet noEnvFs = new AssemblyFileSet(fs);
+            noEnvFs.setDirectory(Paths.get(relative).toString().replace("\\", "/"));
+            noEnvFs.setIncludes(Collections.singletonList("*.*"));
+
+            fileSets.add(fs.toString());
+            fileSets.add(noEnvFs.toString());
+        }
         String assemblyProfilesText = String.join("", fileSets);
         fileSets.clear();
 
@@ -139,16 +146,24 @@ public class ResourceManager {
 
         //替换@pom.extResource@
         List<String> allLocation = getEnvBaseLocations();
+        Collections.reverse(allLocation);
 
         for (String location : allLocation) {
             PomResource pr = new PomResource();
             pr.setDirectory(location + "/${profile.env}");
             pr.setFiltering(false);
             pr.setExcludes(Collections.singletonList(environment.getProfileName()));
-            extResourceBodies.add(pr.toString(3));
 
-            filters.add(location + "/" + environment.getProfileName());
+            //todo 新增 “包括base profile下的文件”
+            PomResource prNoEnv = new PomResource(pr);
+            prNoEnv.setDirectory(location);
+            prNoEnv.setIncludes(Collections.singletonList("*.*"));
+
+            extResourceBodies.add(pr.toString(3));
+            extResourceBodies.add(prNoEnv.toString(3));
+
             filters.add(location + "/${profile.env}/" + environment.getProfileName());
+            filters.add(location + "/" + environment.getProfileName());
         }
         exampleSrc = exampleSrc.replace(POM_EXT_RESOURCE, String.join("", extResourceBodies));
         extResourceBodies.clear();
@@ -226,6 +241,10 @@ public class ResourceManager {
 
         public AssemblyFileSet(int rootTab) {
             this.rootTab = rootTab;
+        }
+
+        public AssemblyFileSet(AssemblyFileSet copy) {
+            copy(copy);
         }
 
         public String getDirectory() {
@@ -327,6 +346,20 @@ public class ResourceManager {
             return builder.toString();
         }
 
+        public void copy(AssemblyFileSet src) {
+            this.rootTab = src.rootTab;
+            this.directory = src.directory;
+            this.outputDirectory = src.outputDirectory;
+            this.fileMode = src.fileMode;
+            this.filtered = src.filtered;
+            if (null != src.excludes) {
+                this.excludes = new ArrayList<>(src.excludes);
+            }
+            if (null != src.includes) {
+                this.includes = new ArrayList<>(src.includes);
+            }
+            this.lineEnding = src.lineEnding;
+        }
     }
 
     private static class PomResource {
@@ -334,10 +367,25 @@ public class ResourceManager {
         public int rootTab = 3;
 
         private String directory;
+        private String targetPath;
         private boolean filtering;
         private List<String> excludes;
+        private List<String> includes;
 
         public PomResource() {
+        }
+
+        public PomResource(PomResource src) {
+            this.rootTab = src.rootTab;
+            this.directory = src.directory;
+            this.targetPath = src.targetPath;
+            this.filtering = src.filtering;
+            if (null != src.excludes) {
+                this.excludes = new ArrayList<>(src.excludes);
+            }
+            if (null != src.includes) {
+                this.includes = new ArrayList<>(src.includes);
+            }
         }
 
         public PomResource(int rootTab) {
@@ -368,6 +416,30 @@ public class ResourceManager {
             this.excludes = excludes;
         }
 
+        public int getRootTab() {
+            return rootTab;
+        }
+
+        public void setRootTab(int rootTab) {
+            this.rootTab = rootTab;
+        }
+
+        public String getTargetPath() {
+            return targetPath;
+        }
+
+        public void setTargetPath(String targetPath) {
+            this.targetPath = targetPath;
+        }
+
+        public List<String> getIncludes() {
+            return includes;
+        }
+
+        public void setIncludes(List<String> includes) {
+            this.includes = includes;
+        }
+
         @Override
         public String toString() {
             return toString(rootTab);
@@ -382,15 +454,26 @@ public class ResourceManager {
             StringBuilder builder = new StringBuilder();
             builder.append(getTabStr("<resource>", rootTab)).append('\n');
 
+            if (StringUtils.isNotBlank(targetPath)) {
+                builder.append(getTabStr(getXmlElement("targetPath", targetPath), secTab)).append('\n');
+            }
             builder.append(getTabStr(getXmlElement("filtering", filtering), secTab)).append('\n');
             builder.append(getTabStr(getXmlElement("directory", directory), secTab)).append('\n');
 
-            if (excludes != null) {
+            if (excludes != null && excludes.size() > 0) {
                 builder.append(getTabStr("<excludes>", secTab)).append("\n");
                 for (String exclude : excludes) {
                     builder.append(getTabStr(getXmlElement("exclude", exclude), trdTab)).append("\n");
                 }
                 builder.append(getTabStr("</excludes>", secTab)).append("\n");
+            }
+
+            if (includes != null && includes.size() > 0) {
+                builder.append(getTabStr("<includes>", secTab)).append("\n");
+                for (String include : includes) {
+                    builder.append(getTabStr(getXmlElement("include", include), trdTab)).append("\n");
+                }
+                builder.append(getTabStr("</includes>", secTab)).append("\n");
             }
 
             builder.append(getTabStr("</resource>", rootTab)).append('\n');
