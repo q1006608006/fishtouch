@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+         xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId> {@your project artifactId here@} </artifactId>
+
+    <description>Example for Project</description>
+
+    <dependencies>
+
+    </dependencies>
+
+    <build>
+        <resources>
+            <!-- 默认资源文件，可以替换参数 -->
+            <resource>
+                <filtering>true</filtering>
+                <directory>${project.basedir}/src/main/resources</directory>
+            </resource>
+
+            <!-- 环境配置文件，不可替换参数 -->
+            <resource>
+                <filtering>false</filtering>
+                <directory>src/main/profile/${profile.env}</directory>
+                <excludes>
+                    <exclude>profile.properties</exclude>
+                </excludes>
+            </resource>
+            <resource>
+                <filtering>false</filtering>
+                <directory>src/main/profile</directory>
+                <excludes>
+                    <exclude>profile.properties</exclude>
+                </excludes>
+                <includes>
+                    <include>*.*</include>
+                </includes>
+            </resource>
+
+        </resources>
+
+        <filters>
+            <!-- 环境参数配置文件 -->
+            <filter>src/main/profile/${profile.env}/profile.properties</filter>
+            <filter>src/main/profile/profile.properties</filter>
+
+        </filters>
+
+        <plugins>
+            <plugin>
+                <artifactId>maven-resources-plugin</artifactId>
+                <configuration>
+                    <delimiters>
+                        <delimiter>@</delimiter>
+                    </delimiters>
+                    <useDefaultDelimiters>false</useDefaultDelimiters>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>3.1.0</version>
+                <executions>
+                    <execution>
+                        <id>make-assembly</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <appendAssemblyId>false</appendAssemblyId>
+                    <filters>
+                        <!-- 环境参数配置文件 -->
+                        <filter>src/main/profile/${profile.env}/profile.properties</filter>
+                        <filter>src/main/profile/profile.properties</filter>
+
+                    </filters>
+                    <descriptors>
+                        <!-- assembly文件 -->
+                        <descriptor>assembly/assembly.xml</descriptor>
+                    </descriptors>
+                    <finalName>${project.build.finalName}-${profile.env}</finalName>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+    <profiles>
+        <!-- 环境参数 -->
+        <profile>
+            <id>prod</id>
+            <properties>
+                <profile.env>prod</profile.env>
+            </properties>
+        </profile>
+        <profile>
+            <id>dev</id>
+            <properties>
+                <profile.env>dev</profile.env>
+            </properties>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+        </profile>
+        <profile>
+            <id>test</id>
+            <properties>
+                <profile.env>test</profile.env>
+            </properties>
+        </profile>
+
+    </profiles>
+</project>
