@@ -42,7 +42,7 @@ application.yml
   xxx.value: @testValue@
 `
 
-|可在对应的 profile/${dev}/profile.properties或${rootPath}/profile/${dev}/profile.properties文件中填入配置：
+> 可在对应的 profile/\${dev}/profile.properties或${rootPath}/profile/${dev}/profile.properties文件中填入配置：
      <build>
 
 `
@@ -55,7 +55,4 @@ application.yml
 ### 打包
   打包命令（根据需要自行添加参数，需配合"make-assembly:package"插件使用，详细参数可见动态生成的pom示例文件）：
   
-｜ mvn install -P${dev}
-
-
-
+> mvn install -P${dev}
