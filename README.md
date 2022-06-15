@@ -42,7 +42,7 @@ application.yml
   xxx.value: @testValue@
 `
 
-| 可在对应的 profile/${dev}/profile.properties或${rootPath}/profile/${dev}/profile.properties文件中填入配置：
+|可在对应的 profile/${dev}/profile.properties或${rootPath}/profile/${dev}/profile.properties文件中填入配置：
      <build>
 
 `
